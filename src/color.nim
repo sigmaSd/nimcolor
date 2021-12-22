@@ -84,16 +84,18 @@ macro createColor(color: untyped, r, g, b: uint8 = 0): untyped =
         proc `colorBg`*[T: ColorType](fmt: T): Colored =
             fmt.rgbBg(`r`, `g`, `b`)
 
-macro createStyles(styles: untyped): untyped =
-  let r = newStmtList()
-  for styleName in styles: 
-    let procName = fmt"{`styleName`}".toLower.ident
-    r.add(
-      quote do:
-        proc `procName`*[T: ColorType](fmt: T): Colored =
-          fmt.style(`styleName`)
-    )
-  r
+macro createStyles(): untyped =
+    let r = newStmtList()
+    for styleNameRaw in Style:
+        let styleName = system.`$`(styleNameRaw).ident
+        let procName = fmt"{`styleName`}".toLower.ident
+        r.add(
+          quote do:
+            proc `procName`*[T: ColorType](fmt: T): Colored =
+                fmt.style(`styleName`)
+        )
+    r
+
 
 createColor(red, 255)
 createColor(green, 0, 255)
@@ -101,4 +103,4 @@ createColor(blue, 0, 0, 255)
 createColor(yellow, 255, 255, 0)
 createColor(purple, 255, 0, 255)
 createColor(lightBlue, 0, 255, 255)
-createStyles([Bold, Faint, Italic, Underline, ReverseVideo, CrossedOut])
+createStyles()
